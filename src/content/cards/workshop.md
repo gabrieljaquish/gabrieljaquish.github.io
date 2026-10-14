@@ -5,5 +5,3 @@ href: /blog/
 linkLabel: Build logs
 order: 40
 ---
-
-Placeholder: a short note about the projects you write up on the blog.
