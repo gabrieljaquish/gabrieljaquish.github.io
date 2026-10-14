@@ -1,0 +1,6 @@
+# Found a security issue on this site? Thank you. Please reach out privately.
+# TODO: point Contact at the contact form once the Cloudflare Worker is live.
+Contact: https://www.linkedin.com/in/gabrieljaquish/
+Expires: 2027-10-14T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://gabrieljaquish.com/.well-known/security.txt

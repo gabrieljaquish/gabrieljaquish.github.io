@@ -1,0 +1,12 @@
+/* TEAM */
+Built by: Gabriel Jaquish
+Site: https://gabrieljaquish.com
+
+/* SITE */
+Standards: HTML, CSS, a strict Content-Security-Policy
+Components: Astro, React
+Hosting: GitHub Pages behind Cloudflare
+Trackers: none
+
+/* THANKS */
+To everyone who reads the source.

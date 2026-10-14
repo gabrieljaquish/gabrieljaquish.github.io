@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /vault/
+
+Sitemap: https://gabrieljaquish.com/sitemap-index.xml

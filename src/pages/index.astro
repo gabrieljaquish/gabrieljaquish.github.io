@@ -1,0 +1,62 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostList from '../components/PostList.astro';
+import { HEADLINE, SITE_TITLE } from '../consts';
+import Base from '../layouts/Base.astro';
+import { getPosts } from '../lib/posts';
+
+const cards = (await getCollection('cards', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const renderedCards = await Promise.all(
+  cards.map(async (card) => ({ card, Content: (await render(card)).Content })),
+);
+const latest = (await getPosts()).slice(0, 3);
+---
+
+<Base>
+  <section class="hero">
+    <h1>{SITE_TITLE}</h1>
+    <p class="headline">{HEADLINE}</p>
+    <p>
+      Placeholder: two or three sentences about who you are and what you spend your time on.
+      Keep it personal without anything that pins down where you live.
+    </p>
+  </section>
+
+  <h2 class="section-title">What I'm working on</h2>
+  <div class="cards">
+    {
+      renderedCards.map(({ card, Content }) => (
+        <article class="card">
+          <h3>{card.data.title}</h3>
+          <p class="tagline">{card.data.tagline}</p>
+          <div class="body">
+            <Content />
+          </div>
+          {card.data.href && (
+            <a
+              class="more"
+              href={card.data.href}
+              rel={card.data.href.startsWith('http') ? 'noopener' : undefined}
+            >
+              {card.data.linkLabel} →
+            </a>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  {
+    latest.length > 0 && (
+      <>
+        <h2 class="section-title">Latest from the blog</h2>
+        <PostList posts={latest} />
+        <p>
+          <a href="/blog/">All posts →</a>
+        </p>
+      </>
+    )
+  }
+</Base>

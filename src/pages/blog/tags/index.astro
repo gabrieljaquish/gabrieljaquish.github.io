@@ -1,0 +1,21 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { countTags, getPosts } from '../../../lib/posts';
+
+const tags = countTags(await getPosts());
+---
+
+<Base title="Tags">
+  <h1>Tags</h1>
+  <ul class="tags">
+    {
+      tags.map(([tag, count]) => (
+        <li>
+          <a href={`/blog/tags/${tag}/`}>
+            #{tag} ({count})
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

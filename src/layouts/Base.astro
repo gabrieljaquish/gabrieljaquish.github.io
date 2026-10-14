@@ -1,0 +1,81 @@
+---
+import '../styles/global.css';
+import { SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../consts';
+
+interface Props {
+  title?: string;
+  description?: string;
+  // Set on cross-posted content so search engines credit the original.
+  canonicalUrl?: string;
+  noindex?: boolean;
+}
+
+const { title, description = SITE_DESCRIPTION, canonicalUrl, noindex = false } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    <link rel="author" href="/humans.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <!--
+      Reading the source? Good instinct.
+      There's more here for people who look closely. Start with the console.
+    -->
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="wrap" aria-label="Main">
+        <a class="brand" href="/">{SITE_TITLE}</a>
+        <ul>
+          <li><a href="/" aria-current={path === '/' ? 'page' : undefined}>Home</a></li>
+          <li>
+            <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul class="links">
+          {
+            SOCIAL_LINKS.map((link) => (
+              <li>
+                <a href={link.href} rel={link.href.startsWith('http') ? 'me noopener' : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p>© {new Date().getFullYear()} {SITE_TITLE}</p>
+      </div>
+    </footer>
+
+    <script>
+      import '../scripts/console-greeting';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatDate, getPosts, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, tags, canonicalUrl } = post.data;
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <article class="prose">
+    <header>
+      <h1>{title}</h1>
+      <div class="meta">
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+        {
+          updatedDate && (
+            <>
+              · Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+            </>
+          )
+        }
+      </div>
+      {
+        tags.length > 0 && (
+          <ul class="tags" aria-label="Tags">
+            {tags.map((tag) => (
+              <li>
+                <a href={`/blog/tags/${tag}/`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      {
+        canonicalUrl && (
+          <p class="meta">
+            Originally published at <a href={canonicalUrl}>{new URL(canonicalUrl).hostname}</a>.
+          </p>
+        )
+      }
+    </header>
+    <Content />
+  </article>
+</Base>
