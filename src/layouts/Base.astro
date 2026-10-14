@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../consts';
+import { getPosts } from '../lib/posts';
 
 interface Props {
   title?: string;
@@ -14,6 +15,8 @@ const { title, description = SITE_DESCRIPTION, canonicalUrl, noindex = false } =
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
 const path = Astro.url.pathname;
+// Blog nav and RSS stay hidden until there's at least one published post.
+const hasPosts = (await getPosts()).length > 0;
 ---
 
 <!doctype html>
@@ -28,7 +31,7 @@ const path = Astro.url.pathname;
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    {hasPosts && <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />}
     <link rel="author" href="/humans.txt" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
@@ -46,9 +49,15 @@ const path = Astro.url.pathname;
         <a class="brand" href="/">{SITE_TITLE}</a>
         <ul>
           <li><a href="/" aria-current={path === '/' ? 'page' : undefined}>Home</a></li>
-          <li>
-            <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
-          </li>
+          {
+            hasPosts && (
+              <li>
+                <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>
+                  Blog
+                </a>
+              </li>
+            )
+          }
         </ul>
       </nav>
     </header>

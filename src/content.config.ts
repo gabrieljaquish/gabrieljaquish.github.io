@@ -9,9 +9,8 @@ const cards = defineCollection({
     title: z.string(),
     // Short line shown under the title.
     tagline: z.string(),
-    // Where the card links. External URLs open the business's own site.
-    href: z.string().optional(),
-    linkLabel: z.string().default('Learn more'),
+    // Links shown at the bottom of the card, in order.
+    links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
     // Lower numbers appear first.
     order: z.number().default(100),
     draft: z.boolean().default(false),

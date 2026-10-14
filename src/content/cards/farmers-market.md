@@ -1,8 +1,11 @@
 ---
-title: Farmers Market
-tagline: ''
-linkLabel: Visit the market
+title: Port Henry Waterfront Farmers' Market
+tagline: Founder and Market Manager
+links:
+  - label: Visit the market
+    href: https://www.porthenrymarket.org/
 order: 30
-# Hidden until the real name, description, and link are filled in.
-draft: true
 ---
+
+A waterfront market for local farmers, makers, and neighbors, heading into its
+fifth season in 2027.

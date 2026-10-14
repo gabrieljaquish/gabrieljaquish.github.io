@@ -25,5 +25,5 @@ const tags = countTags(posts);
     )
   }
 
-  <PostList posts={posts} />
+  {posts.length > 0 ? <PostList posts={posts} /> : <p>No posts yet.</p>}
 </Base>

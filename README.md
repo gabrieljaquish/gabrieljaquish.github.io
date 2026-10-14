@@ -28,7 +28,7 @@ features with `npm run build && npm run preview` before pushing.
 
 | What | Where | Notes |
 |---|---|---|
-| Landing-page card | `src/content/cards/*.md` | Front matter: `title`, `tagline`, optional `href`, `linkLabel`, `order`, `draft` |
+| Landing-page card | `src/content/cards/*.md` | Front matter: `title`, `tagline`, optional `links` (list of `label` + `href`), `order`, `draft` |
 | Blog post | `src/content/blog/*.md` or `*.mdx` | Front matter: `title`, `description`, `pubDate`, `tags`, optional `updatedDate`, `canonicalUrl`, `draft` |
 | Interactive component | `src/components/*.tsx` | Import into an `.mdx` post and render with `client:visible` |
 | Headline, social links | `src/consts.ts` | |
