@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../consts';
 import { getPosts } from '../lib/posts';
+import bgPreload from '../scripts/bg/preload.js?raw';
 
 interface Props {
   title?: string;
@@ -20,9 +21,11 @@ const hasPosts = (await getPosts()).length > 0;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bg="soundings">
   <head>
     <meta charset="utf-8" />
+    <!-- Applies a saved background before first paint; its hash is in the CSP (astro.config.mjs). -->
+    <script is:inline set:html={bgPreload} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="color-scheme" content="light dark" />
@@ -43,6 +46,7 @@ const hasPosts = (await getPosts()).length > 0;
       Reading the source? Good instinct.
       There's more here for people who look closely. Start with the console.
     -->
+    <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <nav class="wrap" aria-label="Main">
@@ -59,6 +63,16 @@ const hasPosts = (await getPosts()).length > 0;
             )
           }
         </ul>
+        <label class="bg-picker" hidden>
+          <span class="visually-hidden">Background</span>
+          <select id="bg-select">
+            <option value="soundings">Lake chart</option>
+            <option value="drafting">Drafting sheet</option>
+            <option value="radio">Radio waterfall</option>
+            <option value="grain">Wood grain</option>
+            <option value="off">No background</option>
+          </select>
+        </label>
       </nav>
     </header>
 
@@ -80,11 +94,19 @@ const hasPosts = (await getPosts()).length > 0;
           }
         </ul>
         <p>© {new Date().getFullYear()} {SITE_TITLE}</p>
+        <p class="bg-credit" data-credit-for="soundings">
+          Lake chart: depths and aids to navigation from{' '}
+          <a href="https://www.charts.noaa.gov/ENCs/ENCs.shtml" rel="noopener">NOAA Office of Coast Survey</a>{' '}
+          charts, shoreline from the{' '}
+          <a href="https://www.usgs.gov/national-hydrography" rel="noopener">USGS National Hydrography Dataset</a>.
+          Contours interpolated. Not for navigation.
+        </p>
       </div>
     </footer>
 
     <script>
       import '../scripts/console-greeting';
+      import '../scripts/bg/manager';
     </script>
   </body>
 </html>

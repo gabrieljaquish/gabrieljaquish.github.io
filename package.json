@@ -10,7 +10,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "test:bg": "node scripts/smoke-bg.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.0.3",

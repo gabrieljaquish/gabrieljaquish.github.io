@@ -8,6 +8,7 @@
   --accent: #1f5fbf;
   --accent-soft: #e8effa;
   --code-bg: #f2f1ee;
+  --faint: #e3e1dc;
   --radius: 10px;
   --max: 46rem;
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -24,7 +25,95 @@
     --accent: #7fb0ff;
     --accent-soft: #1b2638;
     --code-bg: #1d2129;
+    --faint: #2a2f38;
   }
+}
+
+/* Interactive backgrounds (src/scripts/bg). Each brings four base colors; the canvas reads
+   them too, so this is the single source of truth. The other tokens derive from them. */
+html[data-bg='soundings'] { --bg: #f5f0e1; --text: #1c2a34; --accent: #941f63; --faint: #c3d3da; }
+html[data-bg='drafting'] { --bg: #f3efe4; --text: #23262b; --accent: #8e2a17; --faint: #cdc6b3; }
+html[data-bg='radio'] { --bg: #f4f2ed; --text: #1e2227; --accent: #0b6463; --faint: #d8d3c8; }
+html[data-bg='grain'] { --bg: #efe6d6; --text: #2a2219; --accent: #85310b; --faint: #d6c7ad; }
+
+@media (prefers-color-scheme: dark) {
+  html[data-bg='soundings'] { --bg: #0a1521; --text: #d5e1ea; --accent: #e58cc8; --faint: #1c3043; }
+  html[data-bg='drafting'] { --bg: #0f2438; --text: #e3ecf4; --accent: #f2c879; --faint: #2b4866; }
+  html[data-bg='radio'] { --bg: #0b0f13; --text: #e1e6ea; --accent: #f0b45c; --faint: #163038; }
+  html[data-bg='grain'] { --bg: #16130f; --text: #ece4d8; --accent: #f0a35e; --faint: #2f2821; }
+}
+
+html[data-bg]:not([data-bg='off']) {
+  --surface: color-mix(in srgb, var(--bg) 93%, var(--text));
+  --muted: color-mix(in srgb, var(--text) 72%, var(--bg));
+  --border: color-mix(in srgb, var(--bg) 80%, var(--text));
+  --accent-soft: color-mix(in srgb, var(--bg) 84%, var(--accent));
+  --code-bg: color-mix(in srgb, var(--bg) 90%, var(--text));
+  /* Content sits on this so text stays readable over any background. */
+  --panel: color-mix(in srgb, var(--bg) 90%, transparent);
+}
+
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+html[data-bg='off'] .bg-canvas {
+  display: none;
+}
+
+.skip-link,
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-bg]:not([data-bg='off']) .site-header,
+html[data-bg]:not([data-bg='off']) .site-footer {
+  background: var(--panel);
+}
+
+html[data-bg]:not([data-bg='off']) main {
+  background: var(--panel);
+  border-radius: 14px;
+  margin-block: 1.5rem;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.bg-credit {
+  display: none;
+  flex-basis: 100%;
+  font-size: 0.8rem;
+}
+
+html[data-bg='soundings'] .bg-credit[data-credit-for='soundings'] {
+  display: block;
+}
+
+.bg-picker select {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.2rem 0.4rem;
 }
 
 *,
@@ -114,9 +203,9 @@ img {
 
 .site-header nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem 1.25rem;
   padding-block: 1rem;
 }
 
@@ -141,6 +230,7 @@ img {
 
 .brand {
   font-weight: 700;
+  margin-right: auto;
 }
 
 .site-footer {

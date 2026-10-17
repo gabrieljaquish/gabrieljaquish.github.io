@@ -1,0 +1,1 @@
+try{var b=localStorage.getItem('gj.bg');if(b&&/^(soundings|drafting|radio|grain|off)$/.test(b))document.documentElement.setAttribute('data-bg',b)}catch(e){}

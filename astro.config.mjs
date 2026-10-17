@@ -1,9 +1,16 @@
 // @ts-check
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+
+// The background preload runs inline in <head> so a saved background applies before first
+// paint. Astro doesn't hash hand-written inline scripts, so hash the exact file contents here.
+const bgPreload = readFileSync(new URL('./src/scripts/bg/preload.js', import.meta.url), 'utf8');
+const bgPreloadHash = `sha256-${createHash('sha256').update(bgPreload).digest('base64')}`;
 
 // https://astro.build/config
 export default defineConfig({
@@ -31,6 +38,9 @@ export default defineConfig({
         "object-src 'none'",
         'upgrade-insecure-requests',
       ],
+      scriptDirective: {
+        hashes: [/** @type {`sha256-${string}`} */ (bgPreloadHash)],
+      },
     },
   },
 });

@@ -46,6 +46,23 @@ features with `npm run build && npm run preview` before pushing.
   example map tiles), add that origin to `security.csp.directives` in `astro.config.mjs`.
 - Code blocks use Prism, because Shiki's inline styles are incompatible with the CSP.
 
+## Interactive backgrounds
+
+Visitors pick a canvas background from the header (Lake chart by default; Drafting sheet, Radio
+waterfall, Wood grain, or none). The choice is remembered in `localStorage`.
+
+- `src/scripts/bg/manager.ts` loads only the chosen background, remounts it when the color scheme or
+  reduced-motion setting changes, and passes it the palette from the CSS custom properties.
+- Each background is a self-contained module, `src/scripts/bg/<id>.js`, exporting
+  `mount(canvas, options)` (interface in `types.ts`). Palettes live in `global.css` under
+  `html[data-bg='<id>']`.
+- `src/scripts/bg/preload.js` runs inline before first paint so a saved choice doesn't flash. Its
+  SHA-256 is computed in `astro.config.mjs` and added to the CSP; edit the file, never inline it.
+- `npm run test:bg` runs every background in a headless fake browser and fails on exceptions,
+  animation loops that never idle, work in hidden tabs, or listeners and timers left behind.
+- The lake chart draws real NOAA and USGS data for Port Henry to Crown Point from
+  `public/charts/port-henry.json`; see [tools/lake-chart](tools/lake-chart/README.md) to rebuild it.
+
 ## One-time setup
 
 ### GitHub
@@ -93,6 +110,7 @@ pages). Scanners and bug-bounty hunters will report it.
 ## Planned
 
 - Contact form: Cloudflare Worker + Turnstile + Email Routing, so no address is ever published.
+- Site structure for the tinker-space (to be decided).
 - Analytics without trackers: Cloudflare Web Analytics and/or a Worker that records aggregate
   counts (path, referrer, country, network name) and never stores IP addresses.
 - Map page: MapLibre (React) with self-hosted PMTiles on Cloudflare R2.
