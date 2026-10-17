@@ -3,12 +3,18 @@
 
 export const SITE_TITLE = 'Gabriel Jaquish';
 export const SITE_DESCRIPTION =
-  'Security consultant at Amazon Web Services, CISSP, marina co-owner, and founder of the Port Henry Waterfront Farmers\' Market.';
+  "Small business owner, community organizer, and information security professional. Co-owner of Bridgeview Harbour Marina and founder of the Port Henry Waterfront Farmers' Market.";
 
-export const HEADLINE = 'Security architecture. Small business. Community.';
+// How Gabriel describes himself, in his words. Set under his name in the home-page cartouche.
+export const HEADLINE: string | null =
+  'Small business owner, community organizer, and information security professional.';
 
 export const SOCIAL_LINKS = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/gabrieljaquish/' },
   { label: 'GitHub', href: 'https://github.com/gabrieljaquish' },
-  { label: "The Ship's Log", href: 'https://www.bridgeviewharbour.com/blogs/ships-log' },
+  { label: 'The Ship’s Log (marina blog)', href: 'https://www.bridgeviewharbour.com/blogs/ships-log' },
 ];
+
+// Built but never listed in the sitemap (the easter-egg step). Kept in a plain .mjs so the
+// Astro config and scripts/check-dist.mjs read the same list.
+export { HIDDEN_PATHS } from './lib/hidden-paths.mjs';

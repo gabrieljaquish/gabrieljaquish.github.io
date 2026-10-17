@@ -376,7 +376,7 @@ export function mount(canvas, options) {
 
   function sheetTitle() { // the title block names the section: known sections only, never text from an arbitrary URL
     try {
-      return /^\/blog(\/|$)/.test(W.location.pathname) ? 'BLOG' : 'HOME';
+      return /^\/log(\/|$)/.test(W.location.pathname) ? 'LOG' : 'HOME';
     } catch {
       return 'HOME';
     }

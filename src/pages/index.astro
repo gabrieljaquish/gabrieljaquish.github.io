@@ -1,67 +1,55 @@
 ---
-import { getCollection, render } from 'astro:content';
-import PostList from '../components/PostList.astro';
+import LogList from '../components/LogList.astro';
+import Pilot from '../components/Pilot.astro';
 import { HEADLINE, SITE_TITLE } from '../consts';
 import Base from '../layouts/Base.astro';
-import { getPosts } from '../lib/posts';
+import { gates } from '../lib/gates';
 
-const cards = (await getCollection('cards', ({ data }) => !data.draft)).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const renderedCards = await Promise.all(
-  cards.map(async (card) => ({ card, Content: (await render(card)).Content })),
-);
-const latest = (await getPosts()).slice(0, 3);
+const { posts, has } = await gates();
+const latest = posts.slice(0, 3);
 ---
 
 <Base>
-  <section class="hero">
-    <h1>{SITE_TITLE}</h1>
-    <p class="headline">{HEADLINE}</p>
-    <p>
-      I am a Consultant at Amazon Web Services and co-owner of Bridgeview
-      Harbour Marina. I founded and operate the seasonal Port Henry Waterfront Farmers' Market, and 
-      am VP of the Moriah Chamber Of Commerce.  I love helping small businesses and the communities around them thrive.
+  {/* The chart window: a band of open water, then the cartouche set on the chart. The band and
+      caption let taps fall through to the chart (global.css, main.home). */}
+  <div slot="hero" class="chart-window">
+    <header class="cartouche">
+      <h1>{SITE_TITLE}</h1>
+      {HEADLINE && <p class="cartouche-role">{HEADLINE}</p>}
+      <ul class="cartouche-links" role="list">
+        <li>
+          <a href="https://www.linkedin.com/in/gabrieljaquish/" rel="me noopener">LinkedIn<span aria-hidden="true"> ↗</span></a>
+        </li>
+        {
+          has.colophon && (
+            <li>
+              <a href="/colophon/">How this site is built<span aria-hidden="true"> →</span></a>
+            </li>
+          )
+        }
+      </ul>
+    </header>
+    <p class="chart-caption">
+      <span class="cap-title">Lake Champlain, Port Henry to Crown Point, from NOAA and USGS data. Not for navigation.</span>
+      {/* With gutters, soundings.js shows the depth only over the water beside the column. */}
+      <span class="cap-hint cap-fine cap-wide" aria-hidden="true">Point at the water beside the page to read the depth. Click open water to send a wave.</span>
+      <span class="cap-hint cap-fine cap-narrow" aria-hidden="true">Move the pointer to read the depth. Click open water to send a wave.</span>
+      <span class="cap-hint cap-coarse cap-wide" aria-hidden="true">Press and hold on the water beside the page to read the depth. Tap open water to send a wave.</span>
+      <span class="cap-hint cap-coarse cap-narrow" aria-hidden="true">Press and hold on the water to read the depth. Tap it to send a wave.</span>
     </p>
-  </section>
-
-  <h2 class="section-title">What I spend my time on</h2>
-  <div class="cards">
-    {
-      renderedCards.map(({ card, Content }) => (
-        <article class="card">
-          <h3>{card.data.title}</h3>
-          <p class="tagline">{card.data.tagline}</p>
-          {card.body?.trim() && (
-            <div class="body">
-              <Content />
-            </div>
-          )}
-          {card.data.links.length > 0 && (
-            <ul class="card-links">
-              {card.data.links.map((link) => (
-                <li>
-                  <a href={link.href} rel={link.href.startsWith('http') ? 'noopener' : undefined}>
-                    {link.label} →
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </article>
-      ))
-    }
   </div>
 
+  <Pilot />
+
   {
-    latest.length > 0 && (
-      <>
-        <h2 class="section-title">Latest from the blog</h2>
-        <PostList posts={latest} />
+    has.log && (
+      <section aria-labelledby="log-h" class="home-log">
+        <h2 id="log-h">Logbook</h2>
+        <LogList posts={latest} />
         <p>
-          <a href="/blog/">All posts →</a>
+          <a href="/log/">All entries →</a>
         </p>
-      </>
+      </section>
     )
   }
 </Base>

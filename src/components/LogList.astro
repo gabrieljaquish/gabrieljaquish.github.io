@@ -1,0 +1,37 @@
+---
+// Log entries with a date column, as in a logbook: the ISO date, then the title, description,
+// the decision for decision entries, and tags. Used by /log/, tag pages and the home page.
+import { isoDate, type Post } from '../lib/gates';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="log-list">
+  {
+    posts.map((post) => (
+      <li>
+        <time datetime={isoDate(post.data.pubDate)}>{isoDate(post.data.pubDate)}</time>
+        <div>
+          <a class="title" href={`/log/${post.id}/`}>
+            {post.data.title}
+          </a>
+          <p>{post.data.description}</p>
+          {post.data.kind === 'decision' && <p class="log-decision">Decision: {post.data.decision}</p>}
+          {post.data.tags.length > 0 && (
+            <ul class="tags" aria-label="Tags">
+              {post.data.tags.map((tag) => (
+                <li>
+                  <a href={`/log/tags/${tag}/`}>#{tag}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ul>

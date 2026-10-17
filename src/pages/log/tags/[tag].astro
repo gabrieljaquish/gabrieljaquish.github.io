@@ -1,0 +1,23 @@
+---
+import LogList from '../../../components/LogList.astro';
+import Base from '../../../layouts/Base.astro';
+import { countTags, getPosts, type Post } from '../../../lib/gates';
+
+// Only tags that a published entry uses get a page.
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return countTags(posts).map(([tag]) => ({
+    params: { tag },
+    props: { posts: posts.filter((post) => post.data.tags.includes(tag)) },
+  }));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props as { posts: Post[] };
+---
+
+<Base title={`#${tag}`} description={`Log entries tagged ${tag}.`}>
+  <h1>#{tag}</h1>
+  <p class="muted"><a href="/log/">All entries →</a></p>
+  <LogList posts={posts} />
+</Base>

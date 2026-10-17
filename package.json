@@ -7,11 +7,14 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && node scripts/check-dist.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test:bg": "node scripts/smoke-bg.mjs"
+    "test:bg": "node scripts/smoke-bg.mjs",
+    "test:dist": "node scripts/check-dist.test.mjs",
+    "test:contrast": "node scripts/contrast.mjs",
+    "test": "npm run -s test:dist && npm run -s test:bg && npm run -s test:contrast"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.0.3",

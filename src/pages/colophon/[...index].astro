@@ -1,0 +1,40 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getNotes, noteLetter, type Note } from '../../lib/gates';
+import { directives } from '../../security/csp.mjs';
+
+// Gated: /colophon/ is built only once at least one note is published. Each note publishes on its
+// own; its letter comes from the file name, so the others keep theirs.
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return notes.length ? [{ params: { index: undefined }, props: { notes } }] : [];
+}
+
+const { notes } = Astro.props as { notes: Note[] };
+const items = await Promise.all(notes.map(async (note) => ({ note, Content: (await render(note)).Content })));
+---
+
+<Base
+  title="Colophon"
+  description="How this site is built: where the lake chart comes from, how it's drawn, and how the site handles security and privacy."
+>
+  <h1>Colophon</h1>
+  {
+    items.map(({ note, Content }) => (
+      <section id={note.id} class="note" aria-labelledby={`${note.id}-h`}>
+        <h2 id={`${note.id}-h`}>
+          <span class="note-letter">Note {noteLetter(note.id)}</span> {note.data.title}
+        </h2>
+        <Content />
+        {/* Generated from src/security/csp.mjs, the list astro.config.mjs hands to Astro. */}
+        {note.data.appendix === 'csp-policy' && (
+          <pre class="policy"><code>{directives.join(';\n')}</code></pre>
+        )}
+        {import.meta.env.DEV && note.data.draft && (
+          <p class="draft-flag" data-draft>DRAFT · {note.data.confirm.join(' · ')}</p>
+        )}
+      </section>
+    ))
+  }
+</Base>

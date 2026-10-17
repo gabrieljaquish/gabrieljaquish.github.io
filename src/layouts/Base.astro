@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../consts';
-import { getPosts } from '../lib/posts';
+import { gates, navItems } from '../lib/gates';
 import bgPreload from '../scripts/bg/preload.js?raw';
 
 interface Props {
@@ -16,32 +16,40 @@ const { title, description = SITE_DESCRIPTION, canonicalUrl, noindex = false } =
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
 const path = Astro.url.pathname;
-// Blog nav and RSS stay hidden until there's at least one published post.
-const hasPosts = (await getPosts()).length > 0;
+// Nav items, the RSS link and the colophon links appear only for routes that are actually built
+// (src/lib/gates.ts).
+const { has } = await gates();
+const nav = await navItems();
+// The home page puts its chart window (open water and the cartouche) above the panel.
+const hasHero = Astro.slots.has('hero');
 ---
 
 <!doctype html>
 <html lang="en" data-bg="soundings">
   <head>
     <meta charset="utf-8" />
-    <!-- Applies a saved background before first paint; its hash is in the CSP (astro.config.mjs). -->
-    <script is:inline set:html={bgPreload} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {/* A noindex page (404, vault) gets no canonical: the two signals contradict each other, and
+        the 404 has no URL of its own to point at. */}
+    {!noindex && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    {hasPosts && <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />}
+    {has.log && <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />}
     <link rel="author" href="/humans.txt" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
   </head>
   <body>
+    {/* Applies a saved background before first paint. It is the first thing in <body>, not in
+        <head>, because Astro writes the CSP <meta> after all of the head's own content, and a
+        <meta> policy covers only what comes after it. Its hash is added in astro.config.mjs. */}
+    <script is:inline set:html={bgPreload} />
     <!--
       Reading the source? Good instinct.
       There's more here for people who look closely. Start with the console.
@@ -50,19 +58,20 @@ const hasPosts = (await getPosts()).length > 0;
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <nav class="wrap" aria-label="Main">
-        <a class="brand" href="/">{SITE_TITLE}</a>
-        <ul>
-          <li><a href="/" aria-current={path === '/' ? 'page' : undefined}>Home</a></li>
-          {
-            hasPosts && (
-              <li>
-                <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>
-                  Blog
-                </a>
-              </li>
-            )
-          }
-        </ul>
+        <a class="brand" href="/" aria-current={path === '/' ? 'page' : undefined}>{SITE_TITLE}</a>
+        {
+          nav.length > 0 && (
+            <ul>
+              {nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
         <label class="bg-picker" hidden>
           <span class="visually-hidden">Background</span>
           <select id="bg-select">
@@ -76,8 +85,11 @@ const hasPosts = (await getPosts()).length > 0;
       </nav>
     </header>
 
-    <main id="main" class="wrap">
-      <slot />
+    {/* manager.ts measures the content column from <main>, so its box keeps the same width
+        whether or not there is a hero; the panel fill sits on .panel inside it. */}
+    <main id="main" class:list={['wrap', { home: hasHero }]}>
+      <slot name="hero" />
+      <div class="panel"><slot /></div>
     </main>
 
     <footer class="site-footer">
@@ -92,6 +104,13 @@ const hasPosts = (await getPosts()).length > 0;
               </li>
             ))
           }
+          {
+            has.colophon && (
+              <li>
+                <a href="/colophon/" aria-current={path.startsWith('/colophon/') ? 'page' : undefined}>Colophon</a>
+              </li>
+            )
+          }
         </ul>
         <p>© {new Date().getFullYear()} {SITE_TITLE}</p>
         <p class="bg-credit" data-credit-for="soundings">
@@ -99,7 +118,7 @@ const hasPosts = (await getPosts()).length > 0;
           <a href="https://www.charts.noaa.gov/ENCs/ENCs.shtml" rel="noopener">NOAA Office of Coast Survey</a>{' '}
           charts, shoreline from the{' '}
           <a href="https://www.usgs.gov/national-hydrography" rel="noopener">USGS National Hydrography Dataset</a>.
-          Contours interpolated. Not for navigation.
+          Contours interpolated. Not for navigation{has.noteA ? <>; see <a href="/colophon/#note-a">Note A</a>.</> : '.'}
         </p>
       </div>
     </footer>

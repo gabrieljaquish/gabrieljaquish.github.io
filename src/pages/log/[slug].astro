@@ -1,0 +1,84 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getPosts, getWaypoints, isoDate, waypointNumbers, type Post } from '../../lib/gates';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, tags, canonicalUrl, kind, decision, revisit } = post.data;
+
+// A tag that matches a waypoint's tag links back to it on the home page, with its current number.
+const waypoints = await getWaypoints();
+const numbers = waypointNumbers(waypoints);
+const backLinks = waypoints
+  .filter((wp) => wp.data.tag && tags.includes(wp.data.tag))
+  .map((wp) => ({ href: `/#${wp.id}`, label: `Waypoint (${numbers.get(wp.id)}) · ${wp.data.name}` }));
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <article class="prose">
+    <header>
+      <h1>{title}</h1>
+      <p class="meta">
+        Logged <time datetime={isoDate(pubDate)}>{isoDate(pubDate)}</time>
+        {
+          updatedDate && (
+            <>
+              {' · '}Updated <time datetime={isoDate(updatedDate)}>{isoDate(updatedDate)}</time>
+            </>
+          )
+        }
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="tags" aria-label="Tags">
+            {tags.map((tag) => (
+              <li>
+                <a href={`/log/tags/${tag}/`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      {
+        canonicalUrl && (
+          <p class="meta">
+            Originally published at <a href={canonicalUrl}>{new URL(canonicalUrl).hostname}</a>.
+          </p>
+        )
+      }
+      {
+        backLinks.length > 0 && (
+          <ul class="wp-back" role="list">
+            {backLinks.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+    {
+      kind === 'decision' && (
+        <div class="decision">
+          <p class="note-label">Decision</p>
+          <p>{decision}</p>
+        </div>
+      )
+    }
+    <Content />
+    {
+      revisit && (
+        <p class="meta revisit">
+          Revisit by <time datetime={isoDate(revisit)}>{isoDate(revisit)}</time>
+        </p>
+      )
+    }
+  </article>
+</Base>

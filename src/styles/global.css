@@ -13,6 +13,8 @@
   --max: 46rem;
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* The chart's lettering: the same stack as SERIF in src/scripts/bg/soundings.js. */
+  --serif: ui-serif, 'Iowan Old Style', Georgia, 'Times New Roman', serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -80,10 +82,16 @@ html[data-bg]:not([data-bg='off']) .site-footer {
   background: var(--panel);
 }
 
-html[data-bg]:not([data-bg='off']) main {
+/* The fill sits on .panel, inside <main>, so the home page's chart window above it stays open
+   water. <main> keeps the column's full width: manager.ts measures the column from it. */
+html[data-bg]:not([data-bg='off']) main.wrap {
+  margin-block: 1.5rem;
+  padding: 0;
+}
+
+html[data-bg]:not([data-bg='off']) .panel {
   background: var(--panel);
   border-radius: 14px;
-  margin-block: 1.5rem;
   padding: 2rem 1.25rem 3rem;
 }
 
@@ -139,6 +147,13 @@ body {
 main {
   flex: 1;
   padding-block: 2.5rem 4rem;
+  /* The panel stretches to the footer on short pages, as <main> itself used to. */
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  flex: 1;
 }
 
 .wrap {
@@ -233,6 +248,11 @@ img {
   margin-right: auto;
 }
 
+/* The brand is the home link and carries aria-current on /, but keeps its own color. */
+.site-header a.brand[aria-current='page'] {
+  color: var(--text);
+}
+
 .site-footer {
   border-top: 1px solid var(--border);
   color: var(--muted);
@@ -251,91 +271,323 @@ img {
   margin: 0;
 }
 
-/* Landing page */
-.hero {
-  margin-bottom: 2.5rem;
+/* Home: the chart window. A band of open water, then the cartouche, Gabriel's title block set
+   in the chart's own lettering. The band and caption let pointer input fall through to <body>,
+   where soundings.js listens: it sounds and sends waves only for presses on the open page. */
+main.home {
+  pointer-events: none;
 }
 
-.hero .headline {
-  font-size: 1.2rem;
-  color: var(--muted);
-  margin: 0 0 1rem;
+main.home > .panel,
+main.home .cartouche {
+  pointer-events: auto;
 }
 
-.section-title {
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 2.5rem 0 1rem;
+.chart-window {
+  padding-top: 14vh;
+  padding-top: clamp(5rem, 14svh, 8rem);
+  margin-bottom: 1.25rem;
 }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-  gap: 1rem;
+/* Without gutters (below 61rem) the band is the only place the full chart shows. */
+@media (max-width: 60.99rem) {
+  .chart-window {
+    padding-top: 26vh;
+    padding-top: clamp(8rem, 26svh, 13rem);
+  }
 }
 
-.card {
+html[data-bg='off'] .chart-window {
+  padding-top: 0;
+}
+
+.cartouche {
+  width: fit-content;
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: 1.35rem 2rem 1.15rem;
+  text-align: center;
+  color: var(--text);
+  /* Opaque, so it reads the same over every background. The insets draw the double rule. */
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
+  border: 1px solid var(--text);
+  box-shadow:
+    inset 0 0 0 3px var(--surface),
+    inset 0 0 0 4px var(--text);
 }
 
-.card h3 {
-  margin: 0 0 0.25rem;
-  font-size: 1.15rem;
+.cartouche h1 {
+  margin: 0;
+  /* Balances the tracking after the last letter, so the name sits centred. */
+  padding-left: 0.16em;
+  font: 600 clamp(1.35rem, 3.6vw, 2.1rem) / 1.15 var(--serif);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.card .tagline {
-  color: var(--muted);
-  margin: 0 0 0.75rem;
+.cartouche-role {
+  margin: 0.6rem 0 0;
+  font: 1rem/1.5 var(--font);
+  text-wrap: balance;
 }
 
-.card .body > :first-child {
-  margin-top: 0;
-}
-
-.card-links {
-  list-style: none;
-  margin: auto 0 0;
-  padding: 0;
+.cartouche-links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.35rem 1.25rem;
-  font-weight: 600;
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  font-size: 0.95rem;
 }
 
-.card .body ul {
+@media (max-width: 40rem) {
+  .cartouche {
+    width: calc(100% - 2rem);
+    padding: 1.1rem 0.75rem 1rem;
+  }
+
+  .cartouche h1 {
+    padding-left: 0.12em;
+    letter-spacing: 0.12em;
+  }
+
+  /* With no background there is no chart to show beside it: it takes the column. */
+  html[data-bg='off'] .cartouche {
+    width: auto;
+  }
+}
+
+/* Only the lake chart has a caption. The title line shows without gutters (wider screens get
+   the canvas's own title block); a hint shows only where soundings.js listens for input, so
+   never with reduced motion. The caption sits on the panel fill, like the header, so it reads
+   over the full-strength chart on a phone. */
+.chart-caption {
+  display: none;
+  width: fit-content;
+  max-width: min(34rem, calc(100% - 2rem));
+  margin: 0.75rem auto 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  background: var(--panel);
+  text-align: center;
+  text-wrap: balance;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+html[data-bg='soundings'] .chart-caption {
+  display: block;
+}
+
+.cap-title,
+.cap-hint {
+  display: none;
+}
+
+/* 62rem, not 61rem: with a classic scrollbar the page is up to 15px narrower than the media
+   query's width, so between 61rem and 62rem soundings.js may already have dropped its canvas
+   title block. Showing the title line there too at worst prints the title twice. */
+@media (max-width: 61.99rem) {
+  .cap-title {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (pointer: fine) {
+  .cap-fine {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (pointer: coarse) {
+  .cap-coarse {
+    display: block;
+  }
+}
+
+/* With gutters of 120px or more (61rem and up), soundings.js shows the depth only over the
+   water beside the column, never under the text; below that it reads anywhere. */
+@media (min-width: 61rem) {
+  .cap-narrow {
+    display: none;
+  }
+}
+
+@media (max-width: 60.99rem) {
+  .cap-wide {
+    display: none;
+  }
+}
+
+/* With gutters and no hint to give, the caption would be an empty box. */
+@media (min-width: 62rem) and (prefers-reduced-motion: reduce), (min-width: 62rem) and (pointer: none) {
+  html[data-bg='soundings'] .chart-caption {
+    display: none;
+  }
+}
+
+/* Waypoints, numbered like entries in a Coast Pilot. The numeral is a counter, so it follows
+   the published order; its empty alt text keeps screen readers from reading it on top of the
+   list position. */
+.pilot {
+  list-style: none;
+  counter-reset: pilot;
+  margin: 0;
+  padding: 0;
+}
+
+.pilot > li {
+  position: relative;
+  counter-increment: pilot;
+  padding-block: 1rem;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 1rem;
+}
+
+.pilot > li:first-child {
+  border-top: 0;
+}
+
+.pilot > li:target {
+  background: var(--accent-soft);
+  box-shadow:
+    -0.75rem 0 0 var(--accent-soft),
+    0.75rem 0 0 var(--accent-soft);
+}
+
+.wp-head::before {
+  content: '(' counter(pilot) ') ';
+  content: '(' counter(pilot) ') ' / '';
+  font: italic 1rem/1.54 var(--serif);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* --muted on --accent-soft is under 4.5:1 in the light palettes (scripts/contrast.mjs). */
+.pilot > li:target .wp-head::before {
+  color: var(--text);
+}
+
+/* Forced colors (Windows High Contrast) drop backgrounds and shadows, which would hide the
+   arrival highlight from a log entry's "Waypoint (n)" link. */
+@media (forced-colors: active) {
+  .pilot > li:target {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+.wp-name {
+  display: inline;
+  margin: 0;
+  font: 700 1.1rem/1.4 var(--font);
+}
+
+.wp-body > * {
+  margin: 0.35rem 0 0;
+}
+
+.wp-body ul {
   padding-left: 1.2rem;
 }
 
-/* Post lists */
-.post-list {
+.wp-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  font-weight: 600;
+}
+
+/* From 52rem the numerals hang in the margin. */
+@media (min-width: 52rem) {
+  .pilot {
+    padding-left: 2.75rem;
+  }
+
+  .wp-head::before {
+    position: absolute;
+    left: -2.75rem;
+    width: 2.25rem;
+    text-align: right;
+  }
+
+  .pilot > li:target {
+    box-shadow:
+      -3rem 0 0 var(--accent-soft),
+      0.75rem 0 0 var(--accent-soft);
+  }
+}
+
+/* Draft waypoints show this in `astro dev` only; check-dist fails if one ever ships. */
+.draft-flag {
+  margin: 0.5rem 0 0;
+  font: 0.75rem var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.home-log {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.home-log h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Log lists: a date column, as in a logbook. ISO dates in tabular figures line up. */
+.log-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.post-list li {
+.log-list > li {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.25rem 1rem;
+  /* The date sits on the title's baseline. */
+  align-items: baseline;
   padding-block: 1rem;
   border-bottom: 1px solid var(--border);
 }
 
-.post-list li:last-child {
+.log-list > li:last-child {
   border-bottom: 0;
 }
 
-.post-list a.title {
+.log-list time {
+  font: 0.85rem/1.9 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.log-list a.title {
   font-weight: 600;
   font-size: 1.1rem;
 }
 
-.post-list p {
+.log-list p {
   margin: 0.25rem 0 0;
+}
+
+.log-list .log-decision {
+  font-style: italic;
+}
+
+@media (max-width: 40rem) {
+  .log-list > li {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 
 .meta {
@@ -361,9 +613,75 @@ img {
   text-decoration: none;
 }
 
+/* Forced colors drop the pill's fill; a border keeps its shape. */
+@media (forced-colors: active) {
+  .tags a {
+    border: 1px solid LinkText;
+  }
+}
+
 /* Post body */
 .prose h2 {
   margin-top: 2rem;
+}
+
+.wp-back {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+}
+
+/* A decision entry: the decision in a box at the top, "Revisit by" at the foot. */
+.decision {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+.decision p {
+  margin: 0;
+}
+
+/* Set like .note-letter, but in --text: --muted on --accent-soft is under 4.5:1. */
+.note-label {
+  font: 0.78rem/1.6 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.revisit {
+  margin-top: 2rem;
+}
+
+/* Colophon: lettered notes, as on a chart. */
+.note {
+  scroll-margin-top: 1rem;
+}
+
+.note + .note {
+  margin-top: 2rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.note h2 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.note-letter {
+  margin-right: 0.5rem;
+  font: 0.78rem var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+pre.policy {
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
 .prose blockquote {

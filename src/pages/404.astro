@@ -1,12 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
+import { lsEntries } from '../lib/gates';
+
+// `ls` lists only routes that are actually built.
+const entries = await lsEntries();
 ---
 
 <Base title="Not found" noindex>
   <h1>404</h1>
-  <pre class="terminal" aria-label="Page not found"><span class="prompt">guest@gabrieljaquish:~$</span> cat requested-page
+  <pre class="terminal"><span class="prompt">guest@gabrieljaquish:~$</span> cat requested-page
 <span class="err">cat: requested-page: No such file or directory</span>
 <span class="prompt">guest@gabrieljaquish:~$</span> ls
-<a href="/">home</a>  <a href="/blog/">blog</a>
+{entries.map((e, i) => <>{i > 0 && '  '}<a href={e.href}>{e.label}</a></>)}
 <span class="prompt">guest@gabrieljaquish:~$</span> _</pre>
 </Base>

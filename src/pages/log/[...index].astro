@@ -1,0 +1,39 @@
+---
+import LogList from '../../components/LogList.astro';
+import Base from '../../layouts/Base.astro';
+import { countTags, getPosts, type Post } from '../../lib/gates';
+
+// Gated: /log/ is built only once there is at least one published entry.
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.length ? [{ params: { index: undefined }, props: { posts } }] : [];
+}
+
+const { posts } = Astro.props as { posts: Post[] };
+const tags = countTags(posts);
+---
+
+<Base title="Logbook" description="Notes on security, boats, old diesels, and software.">
+  <h1>Logbook</h1>
+  <p class="muted">
+    Security, the marina, the workshop, and software. The marina’s own blog is{' '}
+    <a href="https://www.bridgeviewharbour.com/blogs/ships-log" rel="noopener">The Ship’s Log</a>.
+  </p>
+
+  {
+    tags.length > 0 && (
+      <ul class="tags" aria-label="Browse by tag">
+        {tags.map(([tag, count]) => (
+          <li>
+            <a href={`/log/tags/${tag}/`}>
+              #{tag} ({count})
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <LogList posts={posts} />
+  <p><a href="/rss.xml">RSS</a></p>
+</Base>

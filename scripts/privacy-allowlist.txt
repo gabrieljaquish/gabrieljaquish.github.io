@@ -1,0 +1,4 @@
+# Tokens that look like US amateur call signs but are not (scripts/check-dist.mjs, rule privacy).
+# One per line. Never add a real call sign here.
+W3C
+K8S

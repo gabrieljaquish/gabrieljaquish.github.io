@@ -5,11 +5,9 @@ import { useState } from 'react';
 
 const ITEMS = [
   'Static output only: nothing runs on the server',
-  'Strict Content-Security-Policy with hashed scripts and styles',
-  'Security headers set at Cloudflare',
+  'Strict Content-Security-Policy: no unsafe-inline, no other origins',
   'No third-party scripts, fonts, or trackers',
   'GitHub Actions pinned to commit SHAs',
-  'Photo metadata stripped at build time',
 ];
 
 export default function HardeningChecklist() {

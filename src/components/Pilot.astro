@@ -1,0 +1,53 @@
+---
+// The home page's waypoints, set like a Coast Pilot: numbered entries, one per part of Gabriel's
+// life, from src/content/waypoints/. The numerals are CSS counters (global.css, .pilot), so they
+// follow the sort order of what is published and never leave gaps.
+import { render } from 'astro:content';
+import { getPosts, getWaypoints } from '../lib/gates';
+
+const [waypoints, posts] = await Promise.all([getWaypoints(), getPosts()]);
+const items = await Promise.all(
+  waypoints.map(async (wp) => ({
+    wp,
+    Content: (await render(wp)).Content,
+    // Log entries tagged like the waypoint; the link appears only once there is one to show.
+    logCount: wp.data.tag ? posts.filter((p) => p.data.tags.includes(wp.data.tag!)).length : 0,
+  })),
+);
+const external = (href: string) => href.startsWith('https://');
+---
+
+{/* role="list" keeps list semantics in Safari/VoiceOver, which drop them with list-style: none. */}
+<ol class="pilot" role="list" aria-label="Waypoints">
+  {
+    items.map(({ wp, Content, logCount }) => (
+      <li id={wp.id}>
+        <div class="wp-head">
+          <h2 class="wp-name">{wp.data.name}</h2>{wp.data.role && <span class="wp-role">, {wp.data.role}</span>}
+        </div>
+        {wp.body?.trim() && (
+          <div class="wp-body">
+            <Content />
+          </div>
+        )}
+        {(wp.data.links.length > 0 || logCount > 0) && (
+          <ul class="wp-links" role="list">
+            {wp.data.links.map((l) => (
+              <li>
+                <a href={l.href} rel={external(l.href) ? 'noopener' : undefined}>{l.label}{external(l.href) && <span aria-hidden="true"> ↗</span>}</a>
+              </li>
+            ))}
+            {logCount > 0 && (
+              <li>
+                <a href={`/log/tags/${wp.data.tag}/`}>Log entries ({logCount}) →</a>
+              </li>
+            )}
+          </ul>
+        )}
+        {import.meta.env.DEV && wp.data.draft && (
+          <p class="draft-flag" data-draft>DRAFT · {wp.data.confirm.join(' · ')}</p>
+        )}
+      </li>
+    ))
+  }
+</ol>

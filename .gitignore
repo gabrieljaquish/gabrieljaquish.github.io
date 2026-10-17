@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # python bytecode (tools/lake-chart)
 __pycache__/
+
+# local-only build blocklist (see scripts/check-dist.mjs)
+scripts/local-blocklist.txt

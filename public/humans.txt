@@ -4,9 +4,10 @@ Site: https://gabrieljaquish.com
 
 /* SITE */
 Standards: HTML, CSS, a strict Content-Security-Policy
-Components: Astro, React
-Hosting: GitHub Pages behind Cloudflare
+Components: Astro
+Hosting: GitHub Pages
 Trackers: none
+Colophon: https://gabrieljaquish.com/colophon/
 
 /* THANKS */
 To everyone who reads the source.
