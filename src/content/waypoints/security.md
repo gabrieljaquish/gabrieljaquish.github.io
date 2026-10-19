@@ -9,4 +9,4 @@ draft: false
 confirm: []
 ---
 
-By day I'm a consultant at Amazon Web Services, and I hold the ISC2 CISSP.
+I am a consultant with Amazon Web Services Professional Services, specializing in security. I hold the ISC2 CISSP.

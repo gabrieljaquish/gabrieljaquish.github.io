@@ -1,6 +1,5 @@
 ---
 name: Bridgeview Harbour Marina
-role: co-owner
 order: 10
 tag: marina
 links:
@@ -12,4 +11,4 @@ draft: false
 confirm: []
 ---
 
-Our marina on Lake Champlain in Port Henry, New York, and a cornerstone of my life.
+Co-owner of Bridgeview Harbour Marina, a full-service boat yard, marina, campground, and event space on Lake Champlain. We serve recreational and commercial boaters, host community events, and provide transient campsites.

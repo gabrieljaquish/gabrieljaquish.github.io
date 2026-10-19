@@ -6,6 +6,4 @@ draft: false
 confirm: []
 ---
 
-I'm VP of the Moriah Chamber of Commerce, and I love helping small businesses and the
-communities around them thrive. I also enjoy building community, working on regional economic
-revitalization, and sitting on advisory boards.
+I’m VP of the Moriah Chamber of Commerce. I love helping small businesses and the communities around them thrive, and I enjoy sitting on advisory boards and helping with regional economic revitalization efforts.

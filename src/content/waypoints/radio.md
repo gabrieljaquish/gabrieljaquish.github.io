@@ -5,4 +5,4 @@ draft: false
 confirm: []
 ---
 
-Amateur (ham) radio, and DMR for the marina.
+Ham radio, plus DMR for the marina.

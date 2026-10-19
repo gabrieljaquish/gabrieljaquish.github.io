@@ -5,5 +5,4 @@ draft: false
 confirm: []
 ---
 
-Sailing, boating, and wooden boats. Philosophy, history, and old houses. Perfecting wood-fired
-pizza, brewing beer, and rebuilding a 1984 Mercedes-Benz 300SD.
+I enjoy philosophy, sailing, boating, perfecting my wood-fired pizza, brewing beer, history, and old houses. I also like working on wood boats, and I’m rebuilding my 1984 Mercedes-Benz 300SD.
